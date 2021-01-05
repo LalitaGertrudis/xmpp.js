@@ -18,6 +18,7 @@ const _sessionEstablishment = require("@xmpp/session-establishment");
 const _streamManagement = require("@xmpp/stream-management");
 
 // SASL mechanisms - order matters and define priority
+const xoauth2 = require("@xmpp/sasl-x-oauth2");
 const anonymous = require("@xmpp/sasl-anonymous");
 const plain = require("@xmpp/sasl-plain");
 
@@ -55,7 +56,7 @@ function client(options = {}) {
     streamFeatures,
   });
   // SASL mechanisms - order matters and define priority
-  const mechanisms = Object.entries({ plain, anonymous }).map(([k, v]) => ({
+  const mechanisms = Object.entries({ xoauth2, plain, anonymous }).map(([k, v]) => ({
     [k]: v(sasl),
   }));
 
