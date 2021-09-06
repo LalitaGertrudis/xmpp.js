@@ -2,9 +2,9 @@
 
 ## Install
 
-Note, if you're using `@xmpp/client` or `@xmpp/component`, you don't need to install `@xmpp/xml` yourself.
+Note, if you're using `@xmpp/client` or `@xmpp/component`, you don't need to install `@xmpp/xml`.
 
-`npm install @xmpp/xml` or `yarn add @xmpp/xml`
+`npm install @xmpp/xml`
 
 ```js
 const xml = require("@xmpp/xml");
@@ -64,7 +64,7 @@ const message = (
 );
 ```
 
-Requires a [preprocessor](https://www.npmjs.com/package/babel-plugin-transform-react-jsx) such as [Babel](http://babeljs.io/) with [@babel/plugin-transform-react-jsx](https://babeljs.io/docs/en/next/babel-plugin-transform-react-jsx.html).
+Requires a preprocessor such as [TypeScript](https://www.typescriptlang.org/) or [Babel](http://babeljs.io/) with [@babel/plugin-transform-react-jsx](https://babeljs.io/docs/en/next/babel-plugin-transform-react-jsx.html).
 
 ## Reading
 
@@ -203,7 +203,7 @@ message.remove(body);
 
 ## JSON
 
-You can embed JSON anywhere but it is recommended to use an appropriate semantic.
+You can embed JSON anywhere but it is recommended to use appropriate semantic.
 
 ```js
 /** @jsx xml */
@@ -223,4 +223,31 @@ JSON.parse(
 );
 ```
 
-See [JSON Containers](https://xmpp.org/extensions/xep-0335.html)
+See also [JSON Containers](https://xmpp.org/extensions/xep-0335.html) and [Simple JSON Messaging](https://xmpp.org/extensions/xep-0432.html).
+
+## Parsing XML strings
+
+`@xmpp/xml` include a function to parse XML strings.
+
+⚠ Use with care. Untrusted input or substitutions can result in invalid XML and side effects.
+
+```js
+const { escapeXML, escapeXMLText };
+const parse = require("@xmpp/xml/lib/parse");
+
+const ctx = parse("<message><body>hello world</body></message>");
+ctx.getChildText("body"); // hello world
+```
+
+If you must use with untrusted input, escape it with `escapeXML` and `escapeXMLText`.
+
+```js
+const { escapeXML, escapeXMLText } = require("@xmpp/xml");
+const parse = require("@xmpp/xml/lib/parse");
+
+const message = parse(`
+  <message to="${escapeXML(to)}">
+    <body>${escapeXMLText(body)}</body>
+  </message>,
+`);
+```

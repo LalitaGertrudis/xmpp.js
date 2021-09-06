@@ -81,3 +81,18 @@ test("socket close", (t) => {
 
   socket.socket.emit("close", evt);
 });
+
+test("sendMany", async (t) => {
+  t.plan(2);
+  const conn = new ConnectionWebSocket();
+  conn.root = xml("root");
+
+  const foo = xml("foo");
+  const bar = xml("bar");
+
+  conn.send = () => {
+    t.pass();
+  };
+
+  await conn.sendMany([foo, bar]);
+});

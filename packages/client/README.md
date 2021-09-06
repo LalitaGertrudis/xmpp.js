@@ -8,7 +8,7 @@ It supports Node.js, browsers and React Native. See [below](#transports) for dif
 
 ## Install
 
-`npm install @xmpp/client @xmpp/debug` or `yarn add @xmpp/client @xmpp/debug`
+`npm install @xmpp/client @xmpp/debug`
 
 ## Setup
 
@@ -166,9 +166,10 @@ xmpp.on("stanza", (stanza) => {
   console.log(stanza.toString());
   if (!stanza.is("message")) return;
 
-  const message = stanza.clone();
-  message.attrs.to = stanza.attrs.from;
-  xmpp.send(message);
+  const { to, from } = stanza.attrs;
+  stanza.attrs.from = to;
+  stanza.attrs.to = from;
+  xmpp.send(stanza);
 });
 ```
 
@@ -230,7 +231,11 @@ xmpp.send(xml("presence")).catch(console.error);
 
 Returns a promise that resolves once the stanza is serialized and written to the socket or rejects if any of those fails.
 
-You can also pass multiple stanzas. Here is an example sending the same text message to multiple recipients.
+### sendMany
+
+Sends multiple stanzas.
+
+Here is an example sending the same text message to multiple recipients.
 
 ```js
 const message = "Hello";
@@ -238,8 +243,12 @@ const recipients = ["romeo@example.com", "juliet@example.com"];
 const stanzas = recipients.map((address) =>
   xml("message", { to: address, type: "chat" }, xml("body", null, message)),
 );
-xmpp.send(...stanzas).catch(console.error);
+xmpp.sendMany(stanzas).catch(console.error);
 ```
+
+Returns a promise that resolves once all the stanzas have been sent.
+
+If you need to send a stanza to multiple recipients we recommend using [Extended Stanza Addressing](https://xmpp.org/extensions/xep-0033.html) instead.
 
 ### xmpp.reconnect
 

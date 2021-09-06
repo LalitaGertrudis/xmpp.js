@@ -86,10 +86,10 @@ class Connection extends EventEmitter {
 
   _detachSocket() {
     const { socketListeners, socket } = this;
-    Object.getOwnPropertyNames(socketListeners).forEach((k) => {
+    for (const k of Object.getOwnPropertyNames(socketListeners)) {
       socket.removeListener(k, socketListeners[k]);
       delete socketListeners[k];
-    });
+    }
     this.socket = null;
     return socket;
   }
@@ -168,10 +168,10 @@ class Connection extends EventEmitter {
 
   _detachParser() {
     const listeners = this.parserListeners;
-    Object.getOwnPropertyNames(listeners).forEach((k) => {
+    for (const k of Object.getOwnPropertyNames(listeners)) {
       this.parser.removeListener(k, listeners[k]);
       delete listeners[k];
-    });
+    }
     this.parser = null;
   }
 
@@ -308,19 +308,10 @@ class Connection extends EventEmitter {
     return this.open({ domain, lang });
   }
 
-  async send(...elements) {
-    let fragment = "";
-
-    for (const element of elements) {
-      element.parent = this.root;
-      fragment += element.toString();
-    }
-
-    await this.write(fragment);
-
-    for (const element of elements) {
-      this.emit("send", element);
-    }
+  async send(element) {
+    element.parent = this.root;
+    await this.write(element.toString());
+    this.emit("send", element);
   }
 
   sendReceive(element, timeout = this.timeout) {
